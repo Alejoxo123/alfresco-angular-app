@@ -1,0 +1,126 @@
+<div class="app-shell">
+    <main class="documents-page">
+        <div class="toolbar">
+            <div class="breadcrumbs">
+                <span *ngFor="let crumb of breadcrumbs; let i = index" class="breadcrumb-item"
+                    [class.clickable]="i < breadcrumbs.length - 1"
+                    (click)="i < breadcrumbs.length - 1 && goToBreadcrumb(crumb, i)">
+                    {{ crumb.name }}
+                    <span *ngIf="i < breadcrumbs.length - 1"> / </span>
+                </span>
+            </div>
+
+            <div class="toolbar-actions">
+                <button (click)="openCreateFolder()">Crear Carpeta</button>
+                <button (click)="openCreateDoc()">Crear Documento de Texto</button>
+                <button (click)="goBack()" [disabled]="breadcrumbs.length <= 1">
+                    Subir un nivel
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="loading" class="loading">
+            Cargando...
+        </div>
+
+        <table class="nodes-table" *ngIf="!loading">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Nombre</th>
+                    <th>Creado</th>
+                    <th>Modificado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let node of items">
+                    <td>
+                        <span class="badge" [class.file]="node.entry.isFile" [class.folder]="node.entry.isFolder">
+                            {{ node.entry.isFolder ? 'Carpeta' : 'Archivo' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngIf="node.entry.isFolder" class="link" (click)="openFolder(node)">
+                            {{ node.entry.name }}
+                        </span>
+                        <span *ngIf="!node.entry.isFolder">
+                            {{ node.entry.name }}
+                        </span>
+                    </td>
+                    <td>{{ node.entry.createdAt | date : 'short' }}</td>
+                    <td>{{ node.entry.modifiedAt | date : 'short' }}</td>
+                    <td class="actions">
+                        <button *ngIf="node.entry.isFile || node.entry.isFolder" (click)="editName(node)">
+                            Editar nombre
+                        </button>
+                        <button *ngIf="node.entry.isFile" (click)="openEditContent(node)">
+                            Editar contenido
+                        </button>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <!-- Modal: crear carpeta -->
+    <div class="modal-backdrop" *ngIf="showCreateFolder">
+        <div class="modal">
+            <h3>Crear carpeta</h3>
+            <input type="text" [(ngModel)]="newFolderName" placeholder="Nombre de la carpeta" />
+            <div class="modal-actions">
+                <button (click)="createFolder()">Crear</button>
+                <button class="secondary" (click)="showCreateFolder = false">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: crear documento -->
+    <div class="modal-backdrop" *ngIf="showCreateDoc">
+        <div class="modal">
+            <h3>Crear documento de texto</h3>
+            <input type="text" [(ngModel)]="newDocName" placeholder="Nombre del documento (ej: nota.txt)" />
+            <div class="modal-actions">
+                <button (click)="createDoc()">Crear</button>
+                <button class="secondary" (click)="showCreateDoc = false">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: editar contenido -->
+    <div class="modal-backdrop" *ngIf="showEditContent">
+        <div class="modal modal-large">
+            <h3>Editar contenido: {{ contentNodeName }}</h3>
+            <textarea rows="10" [(ngModel)]="contentText"></textarea>
+            <div class="modal-actions">
+                <button (click)="saveContent()">Guardar</button>
+                <button class="secondary" (click)="showEditContent = false">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: editar nombre -->
+    <div class="modal-backdrop" *ngIf="showEditName">
+        <div class="modal">
+            <h3>Renombrar documento</h3>
+            <p class="modal-subtitle">
+                Nombre actual:
+                <strong>{{ editNameOriginal }}</strong>
+            </p>
+            <input type="text" [(ngModel)]="editNameValue" placeholder="Nuevo nombre del documento" />
+            <div class="modal-actions">
+                <button (click)="saveName()">Guardar</button>
+                <button class="secondary" (click)="showEditName = false">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

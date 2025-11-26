@@ -1,0 +1,41 @@
+<header class="navbar" *ngIf="showNavbar">
+    <div class="navbar-left">
+        <div class="navbar-logo">B</div>
+        <div class="navbar-title">
+            <span class="app-name">Bridgetech</span>
+            <span class="app-subtitle">Explorador de documentos Alfresco</span>
+        </div>
+    </div>
+
+    <div class="navbar-right" (click)="openUserMenu()">
+        <div class="user-info">
+            <span class="user-name">{{ userName }}</span>
+            <span class="user-role">{{ userRole }}</span>
+        </div>
+        <div class="user-avatar">
+            {{ userInitial }}
+        </div>
+    </div>
+</header>
+
+
+<div class="user-modal-backdrop" *ngIf="showUserMenu">
+    <div class="user-modal">
+        <h3>Cuenta</h3>
+        <p class="user-label">Sesión iniciada como:</p>
+        <div class="user-summary">
+            <div class="user-avatar large">
+                {{ userInitial }}
+            </div>
+            <div>
+                <div class="user-name">{{ userName }}</div>
+                <div class="user-role">{{ userRole }}</div>
+            </div>
+        </div>
+
+        <div class="user-modal-actions">
+            <button class="secondary" (click)="closeUserMenu()">Cancelar</button>
+            <button (click)="logout()">Cerrar sesión</button>
+        </div>
+    </div>
+</div>
