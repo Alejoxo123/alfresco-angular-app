@@ -1,59 +1,250 @@
-# AlfrescoApp
+# 📁 Alfresco Angular App – Prueba Técnica Profesional
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.0.
+Aplicación desarrollada con **Angular 20 (Standalone Components)** que consume la **API REST de Alfresco**, utilizando `alf_ticket` para autenticación.  
+Incluye navegación dinámica de nodos, creación de carpetas y documentos, edición de contenido, manejo de sesión y una interfaz moderna inspirada en Bridgetech.
 
-## Development server
+---
 
-To start a local development server, run:
+# 🚀 Características Principales
 
-```bash
+## 🔐 Autenticación
+- Login usando el endpoint oficial de autenticación de Alfresco:
+```
+POST /alfresco/api/-default-/public/authentication/versions/1/tickets
+```
+- Manejo de `alf_ticket` con almacenamiento local seguro.
+- Redirección automática al módulo de documentos.
+- Logout con invalidación del ticket vía:
+```
+DELETE /alfresco/api/-default-/public/authentication/versions/1/tickets/-me-?alf_ticket=...
+```
+
+---
+
+## 📂 Gestión de Documentos y Carpetas
+
+### ✔ Listado de nodos con paginación
+```
+GET /alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/children?alf_ticket=...
+```
+
+### ✔ Navegación con Breadcrumb dinámico  
+El usuario puede moverse entre carpetas fácilmente, subir de nivel y visualizar el contexto actual.
+
+### ✔ Crear carpetas
+```
+POST /nodes/{parentId}/children
+{
+  "name": "Nueva carpeta",
+  "nodeType": "cm:folder"
+}
+```
+
+### ✔ Crear documentos `.txt`
+```
+POST /nodes/{parentId}/children
+{
+  "name": "documento.txt",
+  "nodeType": "cm:content"
+}
+```
+
+### ✔ Editar nombre de archivos o carpetas
+```
+PUT /nodes/{nodeId}
+{
+  "name": "nuevoNombre"
+}
+```
+
+### ✔ Editar contenido de documentos `.txt`
+```
+PUT /nodes/{nodeId}/content
+Content-Type: text/plain
+```
+
+---
+
+# 🎨 Diseño UI – Bridgetech Style
+
+La aplicación sigue un diseño moderno inspirado en los colores y estilo de Bridgetech:
+
+| Elemento | Color |
+|---------|--------|
+| Azul corporativo | `#004dff` |
+| Azul hover | `#0036b3` |
+| Naranja corporativo | `#ff8000` |
+| Fondo suave | `#f5f6fa` |
+
+Incluye:
+- Navbar fijo y global con menú de usuario.
+- Tarjetas y modales con sombras suaves.
+- Formularios accesibles y responsivos.
+- Tablas modernas con hover y badges visuales.
+- Spinners de carga y notificaciones con `ngx-toastr`.
+
+---
+
+# 🧱 Arquitectura del Proyecto  
+### 🧩 Estructura basada en Standalone Components (sin módulos)
+
+```
+src/
+ ├─ app/
+ │   ├─ login/
+ │   │    ├─ login.ts             # Componente standalone
+ │   │    ├─ login.html
+ │   │    └─ login.scss
+ │   ├─ documents/
+ │   │    ├─ documents.ts         # Lógica principal del explorador
+ │   │    ├─ documents.html
+ │   │    └─ documents.scss
+ │   ├─ navbar/
+ │   │    ├─ navbar.ts            # Barra superior global
+ │   │    ├─ navbar.html
+ │   │    └─ navbar.scss
+ │   ├─ services/
+ │   │    ├─ authentication.ts    # Manjeo de login / logout
+ │   │    └─ alfresco.ts          # CRUD de nodos, contenido y navegación
+ │   ├─ models/
+ │   │    └─ alfresco.models.ts   # Interfaces del API de Alfresco
+ │   ├─ app.routes.ts             # Declaración de rutas standalone
+ │   ├─ app.config.ts             # Providers globales
+ │   └─ app.ts                    # Root component
+ ├─ environments/
+ │   ├─ environment.ts
+ │   └─ environment.development.ts
+ ├─ main.ts                       # Bootstrap de Angular
+ └─ styles.scss                   # Estilos globales (Toastr + fuentes)
+```
+
+---
+
+# 🧬 Principios de Arquitectura Aplicados
+
+### ✔ Standalone Architecture
+- Elimina módulos innecesarios.
+- Cada componente importa solo lo que usa.
+- Providers centralizados en `app.config.ts`.
+
+### ✔ Servicios fuertemente tipados
+- Interfaces separadas en `/models`.
+- HttpClient centralizado por servicio.
+
+### ✔ Manejo de errores profesional
+- Toasts para errores y éxitos.
+- Validaciones de formularios reactivas.
+
+### ✔ Facilidad de mantenimiento
+- UI separada por componentes.
+- Carpetas organizadas por dominio.
+- Código comentado y limpio.
+
+---
+
+# ⚙ Configuración de Environments
+
+### `environment.ts`
+```ts
+export const environment = {
+  production: true,
+  alfrescoBaseUrl: 'http://alfresco-demos.bridgetech.company:8080'
+};
+```
+
+### `environment.development.ts`
+```ts
+export const environment = {
+  production: false,
+  alfrescoBaseUrl: 'http://alfresco-demos.bridgetech.company:8080'
+};
+```
+
+### Uso en servicios
+```ts
+import { environment } from '../../environments/environment';
+
+this.baseUrl = `${environment.alfrescoBaseUrl}/alfresco/api/-default-/public/...`;
+```
+
+---
+
+# 🛠 Instalación y Ejecución
+
+### 1️⃣ Clonar el repositorio
+```
+git clone https://github.com/Alejoxo123/alfresco-angular-app.git
+```
+
+### 2️⃣ Instalar dependencias
+```
+npm install
+```
+
+### 3️⃣ Ejecutar servidor local
+```
 ng serve
 ```
+Abrir → http://localhost:4200/
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+# 🏗 Compilar para producción
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Genera los archivos en `/dist`.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+# 🧪 Scripts disponibles
 
-```bash
-ng test
+```
+npm start
+npm run build
+npm run watch
+npm test
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+# 📦 Cómo subir este proyecto a GitHub
 
-```bash
-ng e2e
+```
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/Alejoxo123/alfresco-angular-app.git
+git pull origin main --allow-unrelated-histories
+git push -u origin main
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+# 🏁 Objetivos de la prueba técnica logrados
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- ✔ Login con ticket de Alfresco  
+- ✔ Almacenamiento persistente de sesión  
+- ✔ Listado de nodos con navegación jerárquica  
+- ✔ Breadcrumb inteligente  
+- ✔ Crear carpetas  
+- ✔ Crear documentos `.txt`  
+- ✔ Editar nombre  
+- ✔ Editar contenido  
+- ✔ Logout con invalidación real del ticket  
+- ✔ UI moderna con estilo Bridgetech  
+- ✔ Notificaciones con Toastr  
+- ✔ Arquitectura limpia y profesional  
+- ✔ Uso avanzado de componentes standalone  
+
+---
+
+# 📄 Licencia
+Proyecto desarrollado exclusivamente para fines de evaluación técnica y demostración.
+
+---
+
+¡Gracias por revisar este proyecto!  
+Si deseas una versión del README con screenshots o GIFs, puedo generarlos también.
